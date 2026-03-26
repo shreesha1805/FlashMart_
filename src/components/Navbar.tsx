@@ -2,6 +2,7 @@ import { ShoppingCart, MapPin, Search, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
+import { useCart } from "@/hooks/use-cart";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +13,7 @@ import {
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
+  const { totalItems, setIsOpen } = useCart();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -85,9 +87,18 @@ const Navbar = () => {
             </Button>
           )}
 
-          <Button size="sm" className="gradient-primary text-primary-foreground border-0 rounded-full gap-2 font-semibold">
+          <Button
+            size="sm"
+            className="gradient-primary text-primary-foreground border-0 rounded-full gap-2 font-semibold relative"
+            onClick={() => setIsOpen(true)}
+          >
             <ShoppingCart className="w-4 h-4" />
             <span>Cart</span>
+            {totalItems > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-secondary text-secondary-foreground text-xs font-bold flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
           </Button>
         </div>
       </div>
