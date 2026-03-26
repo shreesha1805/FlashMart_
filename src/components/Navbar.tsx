@@ -1,5 +1,6 @@
-import { ShoppingCart, MapPin, Search } from "lucide-react";
+import { ShoppingCart, MapPin, Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
@@ -26,6 +27,12 @@ const Navbar = () => {
             <MapPin className="w-4 h-4 text-primary" />
             <span>Set location</span>
           </button>
+          <Button variant="ghost" size="sm" className="rounded-full gap-2" asChild>
+            <Link to="/auth">
+              <User className="w-4 h-4" />
+              <span className="hidden sm:inline">Sign Up</span>
+            </Link>
+          </Button>
           <Button size="sm" className="gradient-primary text-primary-foreground border-0 rounded-full gap-2 font-semibold">
             <ShoppingCart className="w-4 h-4" />
             <span>Cart</span>
