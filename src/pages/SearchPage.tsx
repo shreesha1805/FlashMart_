@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ArrowLeft, Clock, Plus } from "lucide-react";
+import { Search, ArrowLeft, Clock, Plus, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/hooks/use-cart";
 
 const allProducts = [
   { name: "Fresh Bananas", weight: "1 dozen", price: 45, oldPrice: 60, time: "8 min", img: "🍌", category: "Fruits & Veggies" },
@@ -27,6 +28,7 @@ const SearchPage = () => {
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { addItem, items } = useCart();
 
   const categories = useMemo(() => {
     return [...new Set(allProducts.map((p) => p.category))];
@@ -42,7 +44,6 @@ const SearchPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sticky search bar */}
       <div className="sticky top-0 z-50 bg-card/95 backdrop-blur-lg border-b border-border px-4 py-3">
         <div className="container mx-auto flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="text-muted-foreground hover:text-foreground transition-colors">
@@ -62,7 +63,6 @@ const SearchPage = () => {
       </div>
 
       <div className="container mx-auto px-4 py-6">
-        {/* Category filters */}
         <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
           <Button
             variant={selectedCategory === null ? "default" : "outline"}
@@ -85,45 +85,58 @@ const SearchPage = () => {
           ))}
         </div>
 
-        {/* Results count */}
         <p className="text-sm text-muted-foreground mb-4">
           {filtered.length} {filtered.length === 1 ? "product" : "products"} found
           {query && <> for "<strong className="text-foreground">{query}</strong>"</>}
         </p>
 
-        {/* Product grid */}
         {filtered.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filtered.map((product) => (
-              <div
-                key={product.name}
-                className="bg-card rounded-xl border border-border p-4 hover:shadow-lg transition-shadow group"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="inline-flex items-center gap-1 text-xs text-primary font-medium bg-accent rounded-full px-2 py-0.5">
-                    <Clock className="w-3 h-3" />
-                    {product.time}
-                  </span>
-                  <span className="text-xs text-secondary font-semibold bg-secondary/10 rounded-full px-2 py-0.5">
-                    {Math.round((1 - product.price / product.oldPrice) * 100)}% OFF
-                  </span>
-                </div>
-                <div className="text-5xl text-center py-4 group-hover:scale-110 transition-transform">
-                  {product.img}
-                </div>
-                <h3 className="font-heading font-semibold text-sm text-foreground">{product.name}</h3>
-                <p className="text-xs text-muted-foreground">{product.weight}</p>
-                <div className="flex items-center justify-between mt-3">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="font-heading font-bold text-foreground">₹{product.price}</span>
-                    <span className="text-xs text-muted-foreground line-through">₹{product.oldPrice}</span>
+            {filtered.map((product) => {
+              const inCart = items.find((i) => i.name === product.name);
+              return (
+                <div
+                  key={product.name}
+                  className="bg-card rounded-xl border border-border p-4 hover:shadow-lg transition-shadow group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="inline-flex items-center gap-1 text-xs text-primary font-medium bg-accent rounded-full px-2 py-0.5">
+                      <Clock className="w-3 h-3" />
+                      {product.time}
+                    </span>
+                    <span className="text-xs text-secondary font-semibold bg-secondary/10 rounded-full px-2 py-0.5">
+                      {Math.round((1 - product.price / product.oldPrice) * 100)}% OFF
+                    </span>
                   </div>
-                  <button className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-primary-foreground hover:opacity-90 transition-opacity">
-                    <Plus className="w-4 h-4" />
-                  </button>
+                  <div className="text-5xl text-center py-4 group-hover:scale-110 transition-transform">
+                    {product.img}
+                  </div>
+                  <h3 className="font-heading font-semibold text-sm text-foreground">{product.name}</h3>
+                  <p className="text-xs text-muted-foreground">{product.weight}</p>
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="font-heading font-bold text-foreground">₹{product.price}</span>
+                      <span className="text-xs text-muted-foreground line-through">₹{product.oldPrice}</span>
+                    </div>
+                    {inCart ? (
+                      <button
+                        onClick={() => addItem(product)}
+                        className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:opacity-80 transition-opacity"
+                      >
+                        <Check className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => addItem(product)}
+                        className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center text-primary-foreground hover:opacity-90 transition-opacity"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-16">
