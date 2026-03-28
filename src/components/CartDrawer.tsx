@@ -1,10 +1,12 @@
 import { Minus, Plus, Trash2, ShoppingBag, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 const CartDrawer = () => {
   const { items, updateQuantity, removeItem, totalItems, totalPrice, isOpen, setIsOpen } = useCart();
+  const navigate = useNavigate();
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -72,7 +74,10 @@ const CartDrawer = () => {
                 <span className="text-sm text-muted-foreground">Subtotal</span>
                 <span className="font-heading font-bold text-lg text-foreground">₹{totalPrice}</span>
               </div>
-              <Button className="w-full gradient-primary text-primary-foreground border-0 rounded-full font-semibold h-12 text-base">
+              <Button
+                className="w-full gradient-primary text-primary-foreground border-0 rounded-full font-semibold h-12 text-base"
+                onClick={() => { setIsOpen(false); navigate("/checkout"); }}
+              >
                 Proceed to Checkout
               </Button>
             </div>
