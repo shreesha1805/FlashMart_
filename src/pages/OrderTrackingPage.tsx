@@ -35,7 +35,8 @@ function LeafletMap({ driverIndex }: { driverIndex: number }) {
   const initMap = useCallback(async () => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
-    const L = await import("https://esm.sh/leaflet@1.9.4");
+    // @ts-ignore - dynamic ESM import
+    const L = (await import("https://esm.sh/leaflet@1.9.4")).default;
 
     // Add CSS
     if (!document.getElementById("leaflet-css")) {
