@@ -1,59 +1,21 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Phone, MessageCircle, Clock, MapPin, Navigation, CheckCircle2, Package, Bike } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 
-// Fix leaflet default marker icons
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-});
+// Simulated route points (store → delivery location in Delhi)
+const storeLocation = { lat: 28.6139, lng: 77.2090 };
+const homeLocation = { lat: 28.6280, lng: 77.2195 };
 
-const deliveryIcon = new L.DivIcon({
-  html: `<div style="background: hsl(142, 76%, 36%); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>
-  </div>`,
-  className: "",
-  iconSize: [36, 36],
-  iconAnchor: [18, 18],
-});
-
-const homeIcon = new L.DivIcon({
-  html: `<div style="background: hsl(346, 77%, 50%); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-  </div>`,
-  className: "",
-  iconSize: [36, 36],
-  iconAnchor: [18, 18],
-});
-
-const storeIcon = new L.DivIcon({
-  html: `<div style="background: hsl(220, 70%, 50%); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>
-  </div>`,
-  className: "",
-  iconSize: [36, 36],
-  iconAnchor: [18, 18],
-});
-
-// Simulated route points (store → delivery location)
-const storeLocation: [number, number] = [28.6139, 77.2090]; // Delhi center
-const homeLocation: [number, number] = [28.6280, 77.2195];
-
-const routePoints: [number, number][] = [
+const routePoints = [
   storeLocation,
-  [28.6155, 77.2105],
-  [28.6170, 77.2120],
-  [28.6190, 77.2135],
-  [28.6210, 77.2150],
-  [28.6230, 77.2165],
-  [28.6255, 77.2175],
-  [28.6270, 77.2185],
+  { lat: 28.6155, lng: 77.2105 },
+  { lat: 28.6170, lng: 77.2120 },
+  { lat: 28.6190, lng: 77.2135 },
+  { lat: 28.6210, lng: 77.2150 },
+  { lat: 28.6230, lng: 77.2165 },
+  { lat: 28.6255, lng: 77.2175 },
+  { lat: 28.6270, lng: 77.2185 },
   homeLocation,
 ];
 
@@ -65,33 +27,87 @@ const trackingSteps = [
   { label: "Delivered", icon: MapPin, time: "" },
 ];
 
-function AnimatedMarker({ positions }: { positions: [number, number][] }) {
-  const map = useMap();
-  const [index, setIndex] = useState(0);
-  const markerRef = useRef<L.Marker | null>(null);
+function LeafletMap({ driverIndex }: { driverIndex: number }) {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const driverMarkerRef = useRef<any>(null);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => {
-        const next = Math.min(prev + 1, positions.length - 1);
-        return next;
-      });
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [positions.length]);
+  const initMap = useCallback(async () => {
+    if (!mapRef.current || mapInstanceRef.current) return;
 
-  useEffect(() => {
-    if (markerRef.current) {
-      markerRef.current.setLatLng(positions[index]);
+    const L = await import("https://esm.sh/leaflet@1.9.4");
+
+    // Add CSS
+    if (!document.getElementById("leaflet-css")) {
+      const link = document.createElement("link");
+      link.id = "leaflet-css";
+      link.rel = "stylesheet";
+      link.href = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";
+      document.head.appendChild(link);
     }
-    map.panTo(positions[index], { animate: true, duration: 1 });
-  }, [index, map, positions]);
 
-  return (
-    <Marker position={positions[index]} icon={deliveryIcon} ref={markerRef}>
-      <Popup>🚴 Delivery Partner</Popup>
-    </Marker>
-  );
+    const map = L.map(mapRef.current).setView([28.6200, 77.2140], 14);
+    mapInstanceRef.current = map;
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
+    }).addTo(map);
+
+    // Route line
+    const latlngs = routePoints.map((p) => [p.lat, p.lng] as [number, number]);
+    L.polyline(latlngs, { color: "#16a34a", weight: 4, opacity: 0.7, dashArray: "8, 8" }).addTo(map);
+
+    // Store marker
+    const storeDiv = L.divIcon({
+      html: `<div style="background:#3b82f6;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-size:16px;">🏪</div>`,
+      className: "",
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+    });
+    L.marker([storeLocation.lat, storeLocation.lng], { icon: storeDiv }).addTo(map).bindPopup("MartFlash Store");
+
+    // Home marker
+    const homeDiv = L.divIcon({
+      html: `<div style="background:#ef4444;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-size:16px;">🏠</div>`,
+      className: "",
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+    });
+    L.marker([homeLocation.lat, homeLocation.lng], { icon: homeDiv }).addTo(map).bindPopup("Your Location");
+
+    // Driver marker
+    const driverDiv = L.divIcon({
+      html: `<div style="background:#16a34a;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-size:18px;">🚴</div>`,
+      className: "",
+      iconSize: [36, 36],
+      iconAnchor: [18, 18],
+    });
+    const pos = routePoints[0];
+    driverMarkerRef.current = L.marker([pos.lat, pos.lng], { icon: driverDiv }).addTo(map).bindPopup("Delivery Partner");
+
+    // Fix map size
+    setTimeout(() => map.invalidateSize(), 200);
+  }, []);
+
+  useEffect(() => {
+    initMap();
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, [initMap]);
+
+  useEffect(() => {
+    if (driverMarkerRef.current && mapInstanceRef.current) {
+      const pos = routePoints[driverIndex];
+      driverMarkerRef.current.setLatLng([pos.lat, pos.lng]);
+      mapInstanceRef.current.panTo([pos.lat, pos.lng], { animate: true, duration: 1 });
+    }
+  }, [driverIndex]);
+
+  return <div ref={mapRef} className="w-full h-full" />;
 }
 
 const OrderTrackingPage = () => {
@@ -100,12 +116,14 @@ const OrderTrackingPage = () => {
   const orderId = searchParams.get("id") || "XXXX";
   const [currentStep, setCurrentStep] = useState(2);
   const [eta, setEta] = useState(10);
+  const [driverIndex, setDriverIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
+      setDriverIndex((prev) => Math.min(prev + 1, routePoints.length - 1));
       setCurrentStep((prev) => Math.min(prev + 1, 4));
       setEta((prev) => Math.max(prev - 2, 0));
-    }, 8000);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -130,30 +148,7 @@ const OrderTrackingPage = () => {
 
       {/* Map */}
       <div className="flex-1 relative" style={{ minHeight: "45vh" }}>
-        <MapContainer
-          center={[28.6200, 77.2140]}
-          zoom={14}
-          scrollWheelZoom={false}
-          className="w-full h-full"
-          style={{ height: "45vh" }}
-          zoomControl={false}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          <Polyline
-            positions={routePoints}
-            pathOptions={{ color: "hsl(142, 76%, 36%)", weight: 4, opacity: 0.7, dashArray: "8, 8" }}
-          />
-          <AnimatedMarker positions={routePoints} />
-          <Marker position={homeLocation} icon={homeIcon}>
-            <Popup>📍 Your Location</Popup>
-          </Marker>
-          <Marker position={storeLocation} icon={storeIcon}>
-            <Popup>🏪 MartFlash Store</Popup>
-          </Marker>
-        </MapContainer>
+        <LeafletMap driverIndex={driverIndex} />
       </div>
 
       {/* Bottom Sheet */}
