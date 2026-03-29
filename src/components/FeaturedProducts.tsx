@@ -20,7 +20,7 @@ const FeaturedProducts = () => {
   const { addItem, items } = useCart();
 
   return (
-    <section className="py-16 bg-muted/50">
+    <section id="featured-products" className="py-16 bg-muted/50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
           <div>

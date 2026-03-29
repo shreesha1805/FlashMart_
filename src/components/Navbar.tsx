@@ -1,4 +1,5 @@
 import { ShoppingCart, MapPin, Search, User, LogOut } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
@@ -47,7 +48,22 @@ const Navbar = () => {
             <Search className="w-5 h-5" />
           </button>
 
-          <button className="hidden sm:flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <button
+            onClick={() => {
+              if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                  (pos) => {
+                    const { latitude, longitude } = pos.coords;
+                    toast?.(`📍 Location set: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+                  },
+                  () => {
+                    toast?.("Unable to get location. Please enable GPS.");
+                  }
+                );
+              }
+            }}
+            className="hidden sm:flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
             <MapPin className="w-4 h-4 text-primary" />
             <span>Set location</span>
           </button>
