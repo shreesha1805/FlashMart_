@@ -1,52 +1,14 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Search, ArrowLeft, Clock, Plus, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
-
-const allProducts = [
-  { name: "Fresh Bananas", weight: "1 dozen", price: 45, oldPrice: 60, time: "8 min", img: "🍌", category: "Fruits & Veggies", inStock: true },
-  { name: "Whole Milk", weight: "1 liter", price: 68, oldPrice: 75, time: "10 min", img: "🥛", category: "Dairy & Eggs", inStock: true },
-  { name: "Brown Eggs", weight: "6 pcs", price: 72, oldPrice: 90, time: "9 min", img: "🥚", category: "Dairy & Eggs", inStock: true },
-  { name: "Sourdough Bread", weight: "400g", price: 85, oldPrice: 110, time: "10 min", img: "🍞", category: "Bakery", inStock: false },
-  { name: "Greek Yogurt", weight: "400g", price: 120, oldPrice: 150, time: "8 min", img: "🫙", category: "Dairy & Eggs", inStock: true },
-  { name: "Organic Tomatoes", weight: "500g", price: 55, oldPrice: 70, time: "9 min", img: "🍅", category: "Fruits & Veggies", inStock: true },
-  { name: "Chicken Breast", weight: "500g", price: 199, oldPrice: 250, time: "12 min", img: "🍗", category: "Meat", inStock: true },
-  { name: "Fresh Orange Juice", weight: "1 liter", price: 95, oldPrice: 120, time: "10 min", img: "🧃", category: "Beverages", inStock: false },
-  { name: "Avocados", weight: "2 pcs", price: 130, oldPrice: 160, time: "9 min", img: "🥑", category: "Fruits & Veggies", inStock: true },
-  { name: "Cheddar Cheese", weight: "200g", price: 145, oldPrice: 180, time: "10 min", img: "🧀", category: "Dairy & Eggs", inStock: true },
-  { name: "Pasta", weight: "500g", price: 65, oldPrice: 80, time: "8 min", img: "🍝", category: "Bakery", inStock: true },
-  { name: "Green Tea", weight: "25 bags", price: 110, oldPrice: 140, time: "9 min", img: "🍵", category: "Beverages", inStock: true },
-  { name: "Strawberries", weight: "250g", price: 90, oldPrice: 120, time: "10 min", img: "🍓", category: "Fruits & Veggies", inStock: true },
-  { name: "Rice", weight: "1 kg", price: 75, oldPrice: 95, time: "8 min", img: "🍚", category: "Essentials", inStock: true },
-  { name: "Butter", weight: "200g", price: 85, oldPrice: 100, time: "9 min", img: "🧈", category: "Dairy & Eggs", inStock: false },
-  { name: "Dark Chocolate", weight: "100g", price: 110, oldPrice: 135, time: "8 min", img: "🍫", category: "Snacks", inStock: true },
-  { name: "Paneer", weight: "200g", price: 90, oldPrice: 110, time: "9 min", img: "🧊", category: "Dairy & Eggs", inStock: true },
-  { name: "Onions", weight: "1 kg", price: 35, oldPrice: 50, time: "8 min", img: "🧅", category: "Fruits & Veggies", inStock: true },
-  { name: "Potatoes", weight: "1 kg", price: 30, oldPrice: 45, time: "8 min", img: "🥔", category: "Fruits & Veggies", inStock: true },
-  { name: "Garlic", weight: "250g", price: 40, oldPrice: 55, time: "9 min", img: "🧄", category: "Fruits & Veggies", inStock: true },
-  { name: "Spinach", weight: "250g", price: 25, oldPrice: 35, time: "8 min", img: "🥬", category: "Fruits & Veggies", inStock: false },
-  { name: "Coconut Water", weight: "1 liter", price: 55, oldPrice: 70, time: "10 min", img: "🥥", category: "Beverages", inStock: true },
-  { name: "Peanut Butter", weight: "400g", price: 180, oldPrice: 220, time: "9 min", img: "🥜", category: "Snacks", inStock: true },
-  { name: "Honey", weight: "500g", price: 250, oldPrice: 320, time: "10 min", img: "🍯", category: "Essentials", inStock: true },
-  { name: "Corn Flakes", weight: "500g", price: 160, oldPrice: 200, time: "8 min", img: "🥣", category: "Essentials", inStock: true },
-  { name: "Watermelon", weight: "1 pc", price: 60, oldPrice: 80, time: "12 min", img: "🍉", category: "Fruits & Veggies", inStock: true },
-  { name: "Mango", weight: "1 kg", price: 150, oldPrice: 200, time: "10 min", img: "🥭", category: "Fruits & Veggies", inStock: true },
-  { name: "Lamb Chops", weight: "500g", price: 450, oldPrice: 550, time: "15 min", img: "🥩", category: "Meat", inStock: false },
-  { name: "Salmon Fillet", weight: "300g", price: 520, oldPrice: 650, time: "14 min", img: "🐟", category: "Meat", inStock: true },
-  { name: "Croissants", weight: "4 pcs", price: 140, oldPrice: 180, time: "10 min", img: "🥐", category: "Bakery", inStock: true },
-  { name: "Cookies", weight: "200g", price: 95, oldPrice: 120, time: "8 min", img: "🍪", category: "Snacks", inStock: true },
-  { name: "Ice Cream", weight: "500ml", price: 175, oldPrice: 220, time: "10 min", img: "🍦", category: "Snacks", inStock: true },
-  { name: "Coffee Beans", weight: "250g", price: 320, oldPrice: 400, time: "9 min", img: "☕", category: "Beverages", inStock: true },
-  { name: "Olive Oil", weight: "500ml", price: 350, oldPrice: 450, time: "10 min", img: "🫒", category: "Essentials", inStock: true },
-  { name: "Tortilla Wraps", weight: "6 pcs", price: 110, oldPrice: 140, time: "9 min", img: "🌯", category: "Bakery", inStock: true },
-  { name: "Mushrooms", weight: "200g", price: 65, oldPrice: 85, time: "9 min", img: "🍄", category: "Fruits & Veggies", inStock: true },
-  { name: "Bell Peppers", weight: "3 pcs", price: 80, oldPrice: 100, time: "9 min", img: "🫑", category: "Fruits & Veggies", inStock: false },
-];
+import { allProducts } from "@/data/products";
 
 const SearchPage = () => {
-  const [query, setQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get("q") || "");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const navigate = useNavigate();
   const { addItem, items } = useCart();
