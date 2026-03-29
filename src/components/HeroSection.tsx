@@ -1,8 +1,13 @@
 import { Zap, Clock, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "@/hooks/use-cart";
 import heroImage from "@/assets/hero-delivery.png";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+  const { setIsOpen } = useCart();
+
   return (
     <section className="gradient-hero overflow-hidden">
       <div className="container mx-auto px-4 py-16 md:py-24">
@@ -21,10 +26,10 @@ const HeroSection = () => {
               Fresh produce, daily essentials, and your favorite snacks — delivered instantly from stores near you.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Button size="lg" className="gradient-primary text-primary-foreground border-0 rounded-full font-semibold text-base px-8">
+              <Button size="lg" className="gradient-primary text-primary-foreground border-0 rounded-full font-semibold text-base px-8" onClick={() => { navigate("/search"); }}>
                 Order Now
               </Button>
-              <Button size="lg" variant="outline" className="rounded-full font-semibold text-base px-8">
+              <Button size="lg" variant="outline" className="rounded-full font-semibold text-base px-8" onClick={() => { const el = document.getElementById("featured-products"); el?.scrollIntoView({ behavior: "smooth" }); }}>
                 Browse Store
               </Button>
             </div>

@@ -1,4 +1,5 @@
 import { Apple, Milk, Sandwich, Coffee, IceCream, Pill, ShowerHead, Baby } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const categories = [
   { name: "Fruits & Veggies", icon: Apple, color: "bg-green-100 text-green-600" },
@@ -12,6 +13,8 @@ const categories = [
 ];
 
 const Categories = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="py-16">
       <div className="container mx-auto px-4">
@@ -22,6 +25,7 @@ const Categories = () => {
           {categories.map((cat) => (
             <button
               key={cat.name}
+              onClick={() => navigate(`/search?q=${encodeURIComponent(cat.name)}`)}
               className="flex flex-col items-center gap-3 p-4 rounded-xl bg-card border border-border hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer group"
             >
               <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${cat.color} group-hover:scale-110 transition-transform`}>

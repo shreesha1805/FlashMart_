@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const Footer = () => {
   return (
     <footer className="bg-card border-t border-border py-12">
@@ -17,25 +19,25 @@ const Footer = () => {
           <div>
             <h4 className="font-heading font-semibold text-foreground mb-3">Company</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="hover:text-foreground cursor-pointer transition-colors">About Us</li>
-              <li className="hover:text-foreground cursor-pointer transition-colors">Careers</li>
-              <li className="hover:text-foreground cursor-pointer transition-colors">Blog</li>
+              <li><Link to="/search" className="hover:text-foreground transition-colors">About Us</Link></li>
+              <li><Link to="/search" className="hover:text-foreground transition-colors">Careers</Link></li>
+              <li><Link to="/search" className="hover:text-foreground transition-colors">Blog</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-heading font-semibold text-foreground mb-3">Support</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="hover:text-foreground cursor-pointer transition-colors">Help Center</li>
-              <li className="hover:text-foreground cursor-pointer transition-colors">Contact Us</li>
-              <li className="hover:text-foreground cursor-pointer transition-colors">FAQs</li>
+              <li><Link to="/search" className="hover:text-foreground transition-colors">Help Center</Link></li>
+              <li><Link to="/search" className="hover:text-foreground transition-colors">Contact Us</Link></li>
+              <li><Link to="/search" className="hover:text-foreground transition-colors">FAQs</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-heading font-semibold text-foreground mb-3">Legal</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="hover:text-foreground cursor-pointer transition-colors">Privacy Policy</li>
-              <li className="hover:text-foreground cursor-pointer transition-colors">Terms of Service</li>
-              <li className="hover:text-foreground cursor-pointer transition-colors">Refund Policy</li>
+              <li><Link to="/search" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/search" className="hover:text-foreground transition-colors">Terms of Service</Link></li>
+              <li><Link to="/search" className="hover:text-foreground transition-colors">Refund Policy</Link></li>
             </ul>
           </div>
         </div>
