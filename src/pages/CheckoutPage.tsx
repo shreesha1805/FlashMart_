@@ -78,7 +78,12 @@ const CheckoutPage = () => {
           <div className="flex justify-between text-sm"><span className="text-muted-foreground">Payment</span><span className="font-semibold text-foreground capitalize">{selectedPayment === "cod" ? "Cash on Delivery" : selectedPayment?.toUpperCase()}</span></div>
           <div className="flex items-center gap-1.5 text-xs text-primary pt-1"><Clock className="w-3.5 h-3.5" /> Estimated delivery in 10-15 minutes</div>
         </div>
-        <Button className="gradient-primary text-primary-foreground rounded-full mt-4" onClick={() => navigate("/")}>Back to Home</Button>
+        <div className="flex gap-3 mt-4">
+          <Button className="gradient-primary text-primary-foreground rounded-full flex-1" onClick={() => navigate(`/track-order?id=${Math.random().toString(36).slice(2, 10).toUpperCase()}`)}>
+            Track Order
+          </Button>
+          <Button variant="outline" className="rounded-full" onClick={() => navigate("/")}>Home</Button>
+        </div>
       </div>
     );
   }
