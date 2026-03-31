@@ -110,7 +110,7 @@ const Auth = () => {
           <CardDescription className="text-muted-foreground">
             {isSignUp
               ? "Sign up to get groceries delivered in minutes"
-              : "Log in to your MartFlash account"}
+              : "Log in to your FlashMart_ account"}
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
