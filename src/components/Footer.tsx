@@ -42,7 +42,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="border-t border-border mt-8 pt-6 text-center text-sm text-muted-foreground">
-          © 2026 MartFlash. All rights reserved.
+          © 2026 FlashMart_. All rights reserved.. All rights reserved.
         </div>
       </div>
     </footer>

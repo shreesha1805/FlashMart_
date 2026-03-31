@@ -78,7 +78,7 @@ function LeafletMap({ driverIndex }: { driverIndex: number }) {
           iconAnchor: [16, 16],
         });
 
-      L.marker([storeLocation.lat, storeLocation.lng], { icon: makeIcon("🏪", "#3b82f6") }).addTo(map).bindPopup("MartFlash Store");
+      L.marker([storeLocation.lat, storeLocation.lng], { icon: makeIcon("🏪", "#3b82f6") }).addTo(map).bindPopup("L.marker([storeLocation.lat, storeLocation.lng], { icon: makeIcon("🏪", "#3b82f6") }).addTo(map).bindPopup("FlashMart_ Store");");
       L.marker([homeLocation.lat, homeLocation.lng], { icon: makeIcon("🏠", "#ef4444") }).addTo(map).bindPopup("Your Location");
 
       const driverIcon = L.divIcon({
