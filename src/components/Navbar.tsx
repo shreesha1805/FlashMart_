@@ -29,7 +29,7 @@ const Navbar = () => {
           <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center">
             <span className="text-primary-foreground font-heading font-extrabold text-lg">M</span>
           </div>
-          <span className="font-heading font-bold text-xl text-foreground">MartFlash</span>
+          <span className="font-heading font-bold text-xl text-foreground"><span className="font-heading font-bold text-xl text-foreground">FlashMart_</span></span>
         </Link>
 
         <button

@@ -10,7 +10,7 @@ const Footer = () => {
               <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-heading font-extrabold">M</span>
               </div>
-              <span className="font-heading font-bold text-lg text-foreground">MartFlash</span>
+              <span className="font-heading font-bold text-lg text-foreground">FlashMart_</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Instant delivery mart system — groceries, essentials & more in minutes.
@@ -42,7 +42,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="border-t border-border mt-8 pt-6 text-center text-sm text-muted-foreground">
-          © 2026 MartFlash. All rights reserved.
+          © 2026 FlashMart_. All rights reserved.. All rights reserved.
         </div>
       </div>
     </footer>

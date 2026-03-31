@@ -8,7 +8,7 @@ const DownloadBanner = () => {
         <div className="gradient-primary rounded-3xl p-8 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="space-y-4 text-center md:text-left">
             <h2 className="font-heading font-extrabold text-3xl md:text-4xl text-primary-foreground">
-              Get the MartFlash App
+              Get the FlashMart_ App
             </h2>
             <p className="text-primary-foreground/80 max-w-md text-lg">
               Exclusive deals, real-time tracking, and even faster ordering — all in your pocket.
