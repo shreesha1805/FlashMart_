@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { allProducts } from "@/data/products";
+import NotifyMeDialog from "@/components/NotifyMeDialog";
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
@@ -124,7 +125,7 @@ const SearchPage = () => {
                         </button>
                       )
                     ) : (
-                      <span className="text-xs text-muted-foreground font-medium">Notify</span>
+                      <NotifyMeDialog productName={product.name} />
                     )}
                   </div>
                 </div>

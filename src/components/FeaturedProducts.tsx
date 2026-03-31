@@ -1,6 +1,7 @@
 import { Plus, Clock, Check } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { featuredProducts } from "@/data/products";
+import NotifyMeDialog from "@/components/NotifyMeDialog";
 
 const FeaturedProducts = () => {
   const { addItem, items } = useCart();
@@ -66,7 +67,7 @@ const FeaturedProducts = () => {
                       </button>
                     )
                   ) : (
-                    <span className="text-xs text-muted-foreground font-medium">Notify</span>
+                    <NotifyMeDialog productName={product.name} />
                   )}
                 </div>
               </div>
