@@ -67,7 +67,7 @@ const FeaturedProducts = () => {
                       </button>
                     )
                   ) : (
-                    <span className="text-xs text-muted-foreground font-medium">Notify</span>
+                    <NotifyMeDialog productName={product.name} />
                   )}
                 </div>
               </div>
